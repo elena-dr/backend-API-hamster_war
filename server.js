@@ -1,30 +1,44 @@
+//Importera npm-paket och moduler
 import express from 'express'
 import cors from 'cors'
 
+// import path from 'path'
 const app = express()
 const PORT = 6474
+import hamsters from './routes/routes.js'
+import hamsterController from './controllers/hamsterController.js'
+//const staticFolder = path.join(__dirname, 'public')
 
-// const staticFolder = path.join(__dirname, 'public')
+//Ordning är viktigaste!!
 
-
-//Middlware
+//Middleware
+//CORS öppnar vårt projekt så det kan användas från andra domäner
 app.use(cors())
 
+//Parse request body
 app.use(express.urlencoded({ extended: true }))
+
+//Logger - skriv ut infrmation om inkomnande requset
 app.use((req, res, next) => {
-    console.log(`Logger: ${req.method} ${req.url} ${req.body}`)
+    console.log(`Logger: ${req.method} ${req.url}`)
     next()
 })
 
 // Serve static files in this folder
-// app.use( express.static(staticFolder) )
+app.use(express.static('public'))
+
 
 
 //Routes
-app.use('',)
+app.use('/hamsters', hamsters)
+app.use('/random', hamsterController.getRandom)
+app.use('/:id', hamsterController.getById)
+app.use('/hamsters', hamsterController.postHam)
+app.use('/:id', hamsterController.putHam)
+
 
 
 //Starta server
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}.`)
+    console.log(`Server is listening on port ${PORT}`)
 })
