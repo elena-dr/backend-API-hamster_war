@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../database/firebase.js'
 
 let hamsterController = {}
@@ -23,12 +23,17 @@ hamsterController.getAll = async (req, res) => {
 }
 
 hamsterController.getRandom = async (req, res) => {
-    const colRef = collection(db, 'hamsters')
-    const snapshot = await getDocs(colRef)
+    try {
+        const colRef = collection(db, 'hamsters')
+        const snapshot = await getDocs(colRef)
 
-    var randomHamster = snapshot.docs[Math.floor(Math.random() * snapshot.docs.length)].data();
+        var randomHamster = snapshot.docs[Math.floor(Math.random() * snapshot.docs.length)].data();
 
-    res.send(randomHamster)
+        res.send(randomHamster)
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+
 
 }
 
@@ -41,7 +46,7 @@ hamsterController.getById = async (req, res) => {
         //console.log('No such document!');
         res.status(404).send('Hamster not found')
     } else {
-        res.send(hamster.data())
+        res.status(200).send(hamster.data())
     }
 
 }
@@ -49,27 +54,24 @@ hamsterController.getById = async (req, res) => {
 hamsterController.postHam = async (req, res) => {
     console.log('Posting new hamster')
 
-    const colRef = collection(db, 'hamsters')
+    try {
+        const colRef = collection(db, 'hamsters')
+        const newHamster = await addDoc(colRef, {
+            name: req.body.name,
+            age: req.body.age,
+            favFood: req.body.favFood,
+            loves: req.body.loves,
+            imgName: req.body.imgName,
+            wins: req.body.wins,
+            defeats: req.body.defeats,
+            games: req.body.games
+        })
 
-
-    const newHamster = await addDoc(colRef, {
-        name: req.body.name,
-        age: req.body.age,
-        favFood: req.body.favFood,
-        loves: req.body.loves,
-        imgName: req.body.imgName,
-        wins: req.body.wins,
-        defeats: req.body.defeats,
-        games: req.body.games
-    })
-
-    console.log('newHamster', newHamster.id)
-
-
-    // console.log('Added hamster with ID: ', newHamster.id)
-
-    res.status(200).json({ id: newHamster.id })
-
+        //console.log('newHamster', newHamster.id)
+        res.status(200).json({ id: newHamster.id })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
 }
 
 hamsterController.putHam = async (req, res) => {
@@ -94,13 +96,20 @@ hamsterController.putHam = async (req, res) => {
 
 
 hamsterController.deleteHam = async (req, res) => {
-    let deletedId = req.params.id
-    let deletedHamster = await collection(db, 'hamsters').doc(deletedId).delete()
+    try {
+        let deletedId = req.params.id
+        const docRef = doc(db, 'hamsters', deletedId)
+        console.log('docref', docRef)
 
-    console.log('Deleted hamster: ', deletedHamster)
-    res.sendStatus(200)
+        let deletedHamster = await deleteDoc(docRef, deletedId)
+        console.log('Deleted hamster: ', deletedHamster)
+
+        res.sendStatus(200)
+    } catch (error) {
+        res.sendStatus(404)
+    }
+
 }
-
 
 
 
