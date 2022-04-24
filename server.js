@@ -15,6 +15,7 @@ import router from './routes/routes.js'
 app.use(cors())
 
 //Parse request body
+app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //Logger - skriv ut infrmation om inkomnande requset
