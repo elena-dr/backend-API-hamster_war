@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "test-frontend": "npx http-server ./evaluate/"
+    "test-frontend": "npx http-server ./evaluate/",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

@@ -4,9 +4,8 @@ import cors from 'cors'
 
 // import path from 'path'
 const app = express()
-const PORT = 6474
-import hamsters from './routes/routes.js'
-import hamsterController from './controllers/hamsterController.js'
+const PORT = process.env.PORT || 433
+import router from './routes/routes.js'
 //const staticFolder = path.join(__dirname, 'public')
 
 //Ordning är viktigaste!!
@@ -28,15 +27,8 @@ app.use((req, res, next) => {
 app.use(express.static('public'))
 
 
-
 //Routes
-app.use('/hamsters', hamsters)
-app.use('/random', hamsterController.getRandom)
-app.use('/:id', hamsterController.getById)
-app.use('/hamsters', hamsterController.postHam)
-app.use('/:id', hamsterController.putHam)
-
-
+app.use('/hamsters', router)
 
 //Starta server
 app.listen(PORT, () => {
